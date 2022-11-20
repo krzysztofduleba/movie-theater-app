@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <title>Manage screenings</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" th:href="@{../css/styles.css}">
+  <link rel="icon" th:href="@{../img/logo.svg}">
+</head>
+
+<body class="bg-light">
+<header class="sticky-top">
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-custom" id="header-navbar">
+    <div class="container">
+      <a class="navbar-brand" th:href="@{/}">
+        <img th:src="@{../img/logo.svg}" alt="" width="40" height="32">
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+              aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active" th:href="@{/}">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" th:href="@{/screenings}">Screenings</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" th:href="@{/movies/all}">Movies</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" th:href="@{/news}">News</a>
+          </li>
+        </ul>
+        <ul class="navbar-nav mb-2 mb-lg-0">
+          <li class="nav-item" sec:authorize="isAnonymous()">
+            <a class="nav-link" th:href="@{/signin}">
+              <i class="bi bi-box-arrow-in-right"></i>
+              <span>Sign in</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" th:href="@{/signup}" sec:authorize="isAnonymous()">
+              <i class="bi bi-door-open"></i>
+              <span>Sign up</span>
+            </a>
+          </li>
+          <li class="nav-item" sec:authorize="hasRole('ROLE_USER')">
+            <a class="nav-link" th:href="@{/user}">
+              <i class="bi bi-person"></i>
+              <span>Your profile</span>
+            </a>
+          </li>
+          <li class="nav-item dropdown" sec:authorize="hasRole('ROLE_ADMIN')">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+               aria-expanded="false">
+              <i class="bi bi-person"></i>
+              <span>Admin dashboard</span>
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" th:href="@{/admin/screenings}">Manage screenings</a></li>
+              <li><a class="dropdown-item" th:href="@{/admin/movies}">Manage movies</a></li>
+              <li><a class="dropdown-item" th:href="@{/admin/auditoriums}">Manage auditoriums</a></li>
+              <li><a class="dropdown-item" th:href="@{/admin/news}">Manage news</a></li>
+            </ul>
+          </li>
+          <li class="nav-item" sec:authorize="isAuthenticated()">
+            <a class="nav-link" th:href="@{/signout}">
+              <i class="bi bi-box-arrow-left"></i>
+              <span>Sign out</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main class="container">
+  <div class="card bg-white mt-3">
+    <div class="card-body w-50 mx-auto">
+      <h5 class="text-center">Create auditorium</h5>
+      <form method="post" action="#" th:action="@{/admin/screenings/create}" th:object="${newScreening}">
+        <div class="mb-3">
+          <label for="movie" class="form-label">Movie</label>
+          <select class="form-select" aria-label="Select movie" id="movie" th:field="*{movie.id}">
+            <option th:each="movie : ${movies}" th:text="${movie.title}" th:value="${movie.id}"/>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="movie" class="form-label">Auditorium</label>
+          <select class="form-select" aria-label="Select auditorium" id="auditorium" th:field="*{auditorium.id}">
+            <option th:each="auditorium : ${auditoriums}" th:text="${auditorium.name}" th:value="${auditorium.id}"/>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="screeningDate" class="form-label">Date</label>
+          <input th:field="*{screeningDate}" type="date" class="form-control" id="screeningDate" required>
+        </div>
+        <div class="mb-3">
+          <label for="screeningTime" class="form-label">Time</label>
+          <input th:field="*{screeningTime}" type="time" class="form-control" id="screeningTime" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
+  </div>
+  <div class="card bg-white mt-3">
+    <div class="card-body w-50 mx-auto">
+      <h5 class="card-title text-center">Screenings</h5>
+      <table class="table text-center">
+        <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Movie</th>
+          <th scope="col">Auditorium</th>
+          <th scope="col">Date</th>
+          <th scope="col">Time</th>
+          <th scope="col">Delete</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="screening: ${screenings}">
+          <td th:text="${screening.id}"/>
+          <td th:text="${screening.movie.title}"/>
+          <td th:text="${screening.auditorium.name}"/>
+          <td th:text="${screening.screeningDate}"/>
+          <td th:text="${screening.screeningTime}"/>
+          <td>
+            <form method="post" action="#" th:action="@{/admin/screenings/delete}">
+              <input type="hidden" th:value="${screening.id}" name="screeningId"/>
+              <button class="btn btn-danger m-2 my-2 my-sm-0 visibility" type="submit">Delete</button>
+            </form>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<footer class="my-5 text-center text-muted">
+  © Copyright 2021
+</footer>
+
+<script src="../js/navbar-scroll.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+
+</body>
+</html>
